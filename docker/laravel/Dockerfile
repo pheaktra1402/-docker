@@ -18,5 +18,6 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-CMD ["sleep", "infinity"]
+# បញ្ជាឱ្យ Laravel បើកដំណើរការ server លើ port 8000 និងអនុញ្ញាតឱ្យម៉ាស៊ីនខាងក្រៅចូលមើលបាន
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
