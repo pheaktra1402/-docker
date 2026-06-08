@@ -1,12 +1,11 @@
-FROM node:22-alpine
+FROM node:24.12.0-alpine
 
 WORKDIR /app
 
-# ១. ចម្លងឯកសារ package.json ចូលទៅក្នុងកុងតឺន័រ
-COPY vuejs-app/package*.json ./
+COPY docker/vuejs/*.sh /usr/local/bin/
 
-# ២. ដំឡើង node_modules នៅក្នុងកុងតឺន័រ
-RUN npm install
+COPY vuejs-app /app
 
-# ៣. បញ្ជាឲ្យវា run start server របស់ Vite ពេលកុងតឺន័របើកដំណើរការ
-CMD ["npm", "run", "dev"]
+RUN chmod +x /usr/local/bin/*.sh
+
+EXPOSE 5173
