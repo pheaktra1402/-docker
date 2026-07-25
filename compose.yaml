@@ -9,10 +9,18 @@ services:
       - ./laravel-app:/var/www/html
       - laravel_data:/var/www/html/vendor
       - ./docker/laravel/entrypoint.development.sh:/usr/local/bin/entrypoint.development.sh
+      - ./docker/laravel/supervisord.development.conf:/etc/supervisor/conf.d/supervisord.development.conf
     ports:
       - "8000:8000"
     depends_on:
-      - mysql-service
+      mysql-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     command: ["bash", "/usr/local/bin/entrypoint.development.sh"]
 
   vuejs-service:
@@ -29,6 +37,11 @@ services:
       - "5173:5173"
     depends_on:
       - laravel-service
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 5173 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     command: ["sh", "/usr/local/bin/entrypoint.development.sh"]
 
   mysql-service:
@@ -43,6 +56,11 @@ services:
       TZ: UTC
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   phpmyadmin:
     image: phpmyadmin:5.2.2
@@ -57,6 +75,7 @@ services:
       PMA_PASSWORD: root
     ports:
       - "9000:80"
+
 volumes:
   mysql_data:
   laravel_data:
