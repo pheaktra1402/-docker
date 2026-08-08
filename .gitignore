@@ -9,3 +9,6 @@ Desktop.ini
 *.suo
 *.swp
 
+vendor/
+node_modules/
+*.pid

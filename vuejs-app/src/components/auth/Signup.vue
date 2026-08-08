@@ -62,8 +62,8 @@
           </form>
           <div class="social-auth-links text-center mt-3 mb-3">
             <p>- OR -</p>
-            <button @click="googleSignUp()" class="btn btn-block btn-danger">
-              <i class="fab fa-google mr-2"></i> Sign up with Google
+           <button @click="OAuthSignIn('google')" class="btn btn-block btn-danger">
+              <i class="fab fa-google mr-2"></i> Sign in with Google
             </button>
             <button @click="OAuthSignIn('github')" class="btn btn-block btn-dark">
               <i class="fab fa-github mr-2"></i> Sign up with GitHub
