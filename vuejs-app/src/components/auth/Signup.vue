@@ -65,6 +65,9 @@
             <button @click="googleSignUp()" class="btn btn-block btn-danger">
               <i class="fab fa-google mr-2"></i> Sign up with Google
             </button>
+            <button @click="OAuthSignIn('github')" class="btn btn-block btn-dark">
+              <i class="fab fa-github mr-2"></i> Sign up with GitHub
+            </button>
           </div>
           <p class="mb-1">
             <router-link :to="{ name: 'auth.signin' }" class="text-center">I already have an account</router-link>
@@ -88,7 +91,7 @@
 import { reactive, ref } from "vue";
 import { apiSignUp, apiSendVerificationEmail } from "@/functions/api/auth";
 import { LoadingModal, MessageModal, CloseModal } from "@/functions/swal";
-import { apiGoogleOAuthRedirect } from "@/functions/api/google-oauth";
+import { apiOAuthRedirect } from "@/functions/api/oauth";
 
 const user = reactive({
   name: "",
@@ -165,10 +168,10 @@ function resetSignedUpEmail() {
   signedUpEmail.value = "";
 }
 
-const googleSignUp = async () => {
+const OAuthSignIn = async (driver) => {
   try {
     LoadingModal();
-    const response = await apiGoogleOAuthRedirect();
+    const response = await apiOAuthRedirect(driver);
     window.location.href = response.data.redirect_url;
   } catch (error) {
     return MessageModal({ icon: "error", title: "Error", text: error.response?.data?.message || error.message });

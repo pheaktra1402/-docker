@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\GoogleOAuthController;
+use App\Http\Controllers\API\OAuthController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/signin', [AuthController::class, 'signin']);
@@ -13,11 +14,10 @@ Route::post('/send/verification-email', [AuthController::class, 'sendVerificatio
 Route::post('/send/reset-password-email', [AuthController::class, 'sendResetPasswordEmail']);
 Route::post('/set/new-password', [AuthController::class, 'setNewPassword'])->name('set.new-password');
 
-Route::prefix('google')->group(function () {
-    Route::get('/oauth/redirect', [GoogleOAuthController::class, 'googleOAuthRedirect']);
-    Route::get('/oauth/callback', [GoogleOAuthController::class, 'googleOAuthCallback']);
-    Route::post('/oauth/exchange/token', [GoogleOAuthController::class, 'googleOAuthExchangeToken'])->middleware('auth:sanctum');
-});
+Route::get('/{driver}/oauth/redirect', [OAuthController::class, 'OAuthRedirect']);
+Route::get('/{driver}/oauth/callback', [OAuthController::class, 'OAuthCallback']);
+Route::post('/oauth/exchange/token', [OAuthController::class, 'OAuthExchangeToken'])->middleware('auth:sanctum');
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/signout', [AuthController::class, 'signout']);

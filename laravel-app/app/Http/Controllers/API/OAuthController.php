@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Laravel\Socialite\Socialite;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
-class GoogleOAuthController extends Controller
+class OAuthController extends Controller
 {
-    function googleOAuthRedirect(Request $request)
+    public function OAuthRedirect(Request $request, $driver)
     {
         $callback_url = $request->query('callback_url', '');
 
-        $redirectUrl = Socialite::driver('google')
+        $redirectUrl = Socialite::driver($driver)
             ->stateless()
             ->with(['state' => base64_encode($callback_url)])
             ->redirect()
@@ -23,19 +24,20 @@ class GoogleOAuthController extends Controller
         return response(['redirect_url' => $redirectUrl], 200);
     }
 
-    function googleOAuthCallback(Request $request)
+    public function OAuthCallback(Request $request, $driver)
     {
         $callback_url = base64_decode($request->query('state', ''));
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            $oauthUser = Socialite::driver($driver)->stateless()->user();
         } catch (\Exception $e) {
-            return redirect($callback_url . '?error=google_oauth_failed');
+            return redirect($callback_url . '?error=oauth_failed');
         }
 
         $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
+            ['email' => $oauthUser->getEmail()],
             [
-                'name' => $googleUser->getName(),
+                'name' => $oauthUser->getName() ?? $oauthUser->getNickname() ?? 'User',
+                'password' => bcrypt(Str::random(16)),
             ]
         );
 
@@ -50,7 +52,7 @@ class GoogleOAuthController extends Controller
         return redirect($callback_url . '?token=' . urlencode($token));
     }
 
-    function googleOAuthExchangeToken(Request $request)
+    public function OAuthExchangeToken(Request $request)
     {
         $user = $request->user();
 
